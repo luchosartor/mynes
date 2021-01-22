@@ -22,9 +22,9 @@
     - User has no current game —> ok response, returns a new board with selected gameplay parameters  
     - User currently running a game —> ok response, returns game’s choice validation.  
 -  Reset a game: ok response, returns a new board with selected gameplay parameters.  
-- click cell: hit a specified cell and get the result.  
+- click cell: hit a specified cell and get the result. 
     - first cell click —> ok response, starts the game and returns the affected cells with the corresponding output.  
-    - any cell click —> ok responnse:  
+    - any cell click —> ok response:  
         - if cell already clicked: return no affectation.  
         - if cell contains mine: mark game as over, returns all mines cells.  
         - if cell is not a mine: get revealed cells and return output information.  
@@ -43,3 +43,18 @@
     - username does not exists: ok response -> save user and run start new game.  
 - sign out: ?¿
 
+### DTOs
+- Game:
+    - status: OVER, INITIAL, RUNNING
+    - board:
+        - cells: mines, flags, un-clicked, numbers
+        - flags left.
+    - gameplay config: rows, columns, mines.
+    - elapsed time.
+- Click/flag:
+    - board:
+        - cells: mines, flags, un-clicked, numbers.
+        - flags-left.
+    - result: GAME_OVER, SUCCESS.
+      
+[Home](https://github.com/luchosartor/mynes)
