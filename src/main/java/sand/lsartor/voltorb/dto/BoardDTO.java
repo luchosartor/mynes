@@ -1,6 +1,7 @@
 package sand.lsartor.voltorb.dto;
 
 import java.util.List;
+import sand.lsartor.voltorb.model.Cell;
 
 public class BoardDTO {
     private final List<Cell> cells;
