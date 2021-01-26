@@ -64,7 +64,7 @@ public class GameService {
         final ValueCell valueCell = (ValueCell) cell;
         if (valueCell.getValue() != 0) {
             cell.setStatus(CellStatus.REVEALED);
-            gameRepository.saveGame(username, new Game(Status.OVER, game.getStart(), game.getConfig(), game.getBoard()));
+            gameRepository.saveGame(username, new Game(Status.RUNNING, game.getStart(), game.getConfig(), game.getBoard()));
             return Optional.of(new Click(new BoardDTO(Collections.singletonList(valueCell), game.getBoard().getFlagsLeft()), Result.SUCCESS));
         }
         // if value is 0, reveal adjacent cells until all non-zero are revealed.
