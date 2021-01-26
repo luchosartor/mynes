@@ -1,16 +1,15 @@
 package sand.lsartor.voltorb.model;
 
-public class Cell {
+public abstract class Cell {
     private final int x;
     private final int y;
-    private final CellStatus status;
-    private final CellType type;
 
-    public Cell(final int x, final int y, final CellStatus status, final CellType type) {
+    private CellStatus status;
+
+    public Cell(final int x, final int y, final CellStatus status) {
         this.x = x;
         this.y = y;
         this.status = status;
-        this.type = type;
     }
 
     public int getX() {
@@ -25,7 +24,7 @@ public class Cell {
         return status;
     }
 
-    public CellType getType() {
-        return type;
+    public void setStatus(final CellStatus status) {
+        this.status = status;
     }
 }
