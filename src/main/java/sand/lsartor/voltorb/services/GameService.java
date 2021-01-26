@@ -1,7 +1,5 @@
 package sand.lsartor.voltorb.services;
 
-import java.time.OffsetDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -9,6 +7,7 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import sand.lsartor.voltorb.dto.BoardDTO;
 import sand.lsartor.voltorb.dto.Click;
+import sand.lsartor.voltorb.dto.Config;
 import sand.lsartor.voltorb.dto.GameDTO;
 import sand.lsartor.voltorb.dto.Result;
 import sand.lsartor.voltorb.dto.Status;
@@ -20,6 +19,8 @@ import sand.lsartor.voltorb.model.Mine;
 import sand.lsartor.voltorb.model.ValueCell;
 import sand.lsartor.voltorb.repositories.GameRepository;
 import sand.lsartor.voltorb.util.CellUtil;
+import sand.lsartor.voltorb.util.Constants;
+import sand.lsartor.voltorb.util.GameUtil;
 
 @Service
 public class GameService {
@@ -30,14 +31,10 @@ public class GameService {
         this.gameRepository = gameRepository;
     }
 
-    public GameDTO getGame(final String username) {
+    public GameDTO getOrCreateGame(final String username) {
         return gameRepository.getGame(username)
-            .map(this::convertToDTO)
-            .orElseGet(() -> {
-                final Game game = GameFactory.createEmptyGame();
-                gameRepository.saveGame(username, game);
-                return convertToDTO(game);
-            });
+            .map(GameUtil::gameAsDTO)
+            .orElseGet(() -> createGame(username, Constants.DEFAULT_CONFIG));
     }
 
     public Optional<Click> clickCell(final String username, final int x, final int y) {
@@ -78,14 +75,10 @@ public class GameService {
         }
     }
 
-    private long getElapsedTime(final OffsetDateTime start) {
-        if (start != null) {
-            return ChronoUnit.SECONDS.between(start, OffsetDateTime.now());
-        }
-        return 0;
-    }
-
-    private GameDTO convertToDTO(final Game game) {
-        return new GameDTO(game.getStatus(), game.getBoard(), game.getConfig(), getElapsedTime(game.getStart()));
+    public GameDTO createGame(final String username, final Config config) {
+        final Config gameConfig = Optional.ofNullable(config).orElse(Constants.DEFAULT_CONFIG);
+        final Game game = GameFactory.createEmptyGame(gameConfig);
+        gameRepository.saveGame(username, game);
+        return GameUtil.gameAsDTO(game);
     }
 }

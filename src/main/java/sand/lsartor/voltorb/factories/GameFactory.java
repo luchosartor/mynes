@@ -5,13 +5,12 @@ import sand.lsartor.voltorb.dto.Config;
 import sand.lsartor.voltorb.dto.Status;
 import sand.lsartor.voltorb.model.Game;
 
+import static sand.lsartor.voltorb.util.Constants.DEFAULT_CONFIG;
+
 public enum GameFactory {
     ;
-
-    private static final Config DEFAULT_CONFIG = new Config(3, 3, 1);
-
-    public static Game createEmptyGame() {
-        return new Game(Status.INITIAL, DEFAULT_CONFIG, BoardFactory.emptyBoard(DEFAULT_CONFIG));
+    public static Game createEmptyGame(final Config gameConfig) {
+        return new Game(Status.INITIAL, gameConfig, BoardFactory.emptyBoard(gameConfig));
     }
 
     public static Game initGame(final int x, final int y, final Game game) {
