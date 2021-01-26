@@ -2,7 +2,7 @@ package sand.lsartor.voltorb.services;
 
 import java.time.OffsetDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -61,14 +61,21 @@ public class GameService {
             gameRepository.saveGame(username, new Game(Status.OVER, game.getStart(), game.getConfig(), game.getBoard()));
             return Optional.of(new Click(new BoardDTO(mines, game.getBoard().getFlagsLeft()), Result.GAME_OVER));
         }
+        final List<Cell> revealed = new ArrayList<>();
+        revealCells(cell, cells, revealed);
+        gameRepository.saveGame(username, new Game(Status.RUNNING, game.getStart(), game.getConfig(), game.getBoard()));
+        return Optional.of(new Click(new BoardDTO(revealed, game.getBoard().getFlagsLeft()), Result.SUCCESS));
+    }
+
+    private void revealCells(final Cell cell, final List<Cell> cells, final List<Cell> revealed) {
+        cell.setStatus(CellStatus.REVEALED);
         final ValueCell valueCell = (ValueCell) cell;
-        if (valueCell.getValue() != 0) {
-            cell.setStatus(CellStatus.REVEALED);
-            gameRepository.saveGame(username, new Game(Status.RUNNING, game.getStart(), game.getConfig(), game.getBoard()));
-            return Optional.of(new Click(new BoardDTO(Collections.singletonList(valueCell), game.getBoard().getFlagsLeft()), Result.SUCCESS));
+        revealed.add(cell);
+        if (valueCell.getValue() == 0) {
+            cells.stream().filter(c -> Math.abs(c.getX() - cell.getX()) <= 1 && Math.abs(c.getY() - cell.getY()) <= 1)
+                .filter(c -> c.getStatus() != CellStatus.REVEALED)
+                .forEach(c -> revealCells(c, cells, revealed));
         }
-        // if value is 0, reveal adjacent cells until all non-zero are revealed.
-        return Optional.empty();
     }
 
     private long getElapsedTime(final OffsetDateTime start) {
