@@ -15,7 +15,6 @@ import sand.lsartor.voltorb.factories.GameFactory;
 import sand.lsartor.voltorb.model.Cell;
 import sand.lsartor.voltorb.model.CellStatus;
 import sand.lsartor.voltorb.model.Game;
-import sand.lsartor.voltorb.model.Mine;
 import sand.lsartor.voltorb.model.ValueCell;
 import sand.lsartor.voltorb.repositories.GameRepository;
 import sand.lsartor.voltorb.util.CellUtil;
@@ -53,13 +52,18 @@ public class GameService {
         if (cell.getStatus() != CellStatus.CLEAR) {
             return Optional.empty();
         }
-        if (cell instanceof Mine) {
-            final List<Cell> mines = cells.stream().filter(c -> c instanceof Mine).collect(Collectors.toList());
+        if (cell.isMine()) {
+            final List<Cell> mines = cells.stream().filter(Cell::isMine).collect(Collectors.toList());
             gameRepository.saveGame(username, new Game(Status.OVER, game.getStart(), game.getConfig(), game.getBoard()));
             return Optional.of(new Click(new BoardDTO(mines, game.getBoard().getFlagsLeft()), Result.GAME_OVER));
         }
         final List<Cell> revealed = new ArrayList<>();
         revealCells(cell, cells, revealed);
+        final long remainingCells = game.getBoard().getCells().stream().filter(c -> !c.isMine()).filter(c -> c.getStatus() != CellStatus.REVEALED).count();
+        if (remainingCells == 0) {
+            gameRepository.saveGame(username, new Game(Status.VICTORY, game.getStart(), game.getConfig(), game.getBoard()));
+            return Optional.of(new Click(new BoardDTO(revealed, game.getBoard().getFlagsLeft()), Result.VICTORY));
+        }
         gameRepository.saveGame(username, new Game(Status.RUNNING, game.getStart(), game.getConfig(), game.getBoard()));
         return Optional.of(new Click(new BoardDTO(revealed, game.getBoard().getFlagsLeft()), Result.SUCCESS));
     }

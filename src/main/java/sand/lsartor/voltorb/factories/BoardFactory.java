@@ -33,7 +33,7 @@ public class BoardFactory {
             IntStream.range(0, config.getColumns()).forEach(xIndex -> {
                 final Optional<Cell> cell = findCell(cells, xIndex, yIndex);
                 if (cell.isEmpty()) {
-                    final long adjacentMines = cells.stream().filter(c -> c instanceof Mine)
+                    final long adjacentMines = cells.stream().filter(Cell::isMine)
                         .filter(c -> Math.abs(c.getX() - xIndex) <= 1 && Math.abs(c.getY() - yIndex) <= 1).count();
                     cells.add(new ValueCell(xIndex, yIndex, CellStatus.CLEAR, adjacentMines));
                 }

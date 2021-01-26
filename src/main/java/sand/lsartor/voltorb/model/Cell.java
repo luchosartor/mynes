@@ -1,5 +1,7 @@
 package sand.lsartor.voltorb.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 public abstract class Cell {
     private final int x;
     private final int y;
@@ -26,5 +28,10 @@ public abstract class Cell {
 
     public void setStatus(final CellStatus status) {
         this.status = status;
+    }
+
+    @JsonIgnore
+    public boolean isMine() {
+        return this instanceof Mine;
     }
 }
