@@ -47,4 +47,9 @@ public class GameController {
     public Click clickCell(@PathVariable final String username, @RequestBody final Position position) {
         return gameService.clickCell(username, position.x, position.y).orElseThrow(() -> new ResponseStatusException(HttpStatus.NO_CONTENT));
     }
+
+    @PostMapping("/users/{username}/games/flag")
+    public Click flagCell(@PathVariable final String username, @RequestBody final Position position) {
+        return gameService.flagCell(username, position.x, position.y).orElseThrow(() -> new ResponseStatusException(HttpStatus.NO_CONTENT));
+    }
 }

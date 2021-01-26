@@ -1,6 +1,7 @@
 package sand.lsartor.voltorb.services;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -84,5 +85,31 @@ public class GameService {
         final Game game = GameFactory.createEmptyGame(gameConfig);
         gameRepository.saveGame(username, game);
         return GameUtil.gameAsDTO(game);
+    }
+
+    public Optional<Click> flagCell(final String username, final int x, final int y) {
+        Game game = gameRepository.getGame(username).orElseThrow(() -> new IllegalStateException("Cannot click in null game"));
+        final BoardDTO board = game.getBoard();
+        if (game.getStatus() == Status.OVER) {
+            return Optional.of(new Click(board, Result.GAME_OVER));
+        } else if (game.getStatus() == Status.INITIAL) {
+            game = GameFactory.initGame(x, y, game);
+        }
+        final List<Cell> cells = board.getCells();
+        final Cell cell = CellUtil.findCell(cells, x, y).orElseThrow(IllegalStateException::new);
+        if (cell.getStatus() == CellStatus.REVEALED) {
+            return Optional.empty();
+        } else if (cell.getStatus() == CellStatus.FLAG) {
+            cell.setStatus(CellStatus.CLEAR);
+            board.setFlagsLeft(board.getFlagsLeft() + 1);
+        } else {
+            if (board.getFlagsLeft() == 0) {
+                return Optional.empty();
+            }
+            cell.setStatus(CellStatus.FLAG);
+            board.setFlagsLeft(board.getFlagsLeft() - 1);
+        }
+        gameRepository.saveGame(username, new Game(Status.RUNNING, game.getStart(), game.getConfig(), board));
+        return Optional.of(new Click(new BoardDTO(Collections.singletonList(cell), board.getFlagsLeft()), Result.SUCCESS));
     }
 }

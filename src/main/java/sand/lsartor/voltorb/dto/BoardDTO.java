@@ -5,7 +5,7 @@ import sand.lsartor.voltorb.model.Cell;
 
 public class BoardDTO {
     private final List<Cell> cells;
-    private final int flagsLeft;
+    private int flagsLeft;
 
     public BoardDTO(final List<Cell> cells, final int flagsLeft) {
         this.cells = cells;
@@ -18,5 +18,9 @@ public class BoardDTO {
 
     public int getFlagsLeft() {
         return flagsLeft;
+    }
+
+    public void setFlagsLeft(final int flagsLeft) {
+        this.flagsLeft = flagsLeft;
     }
 }
