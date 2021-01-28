@@ -9,7 +9,7 @@ public enum GameUtil {
     ;
     public static long getElapsedTime(final OffsetDateTime start) {
         if (start != null) {
-            return Math.max(ChronoUnit.SECONDS.between(start, OffsetDateTime.now()), Constants.MAX_ELAPSED_TIME);
+            return Math.min(ChronoUnit.SECONDS.between(start, OffsetDateTime.now()), Constants.MAX_ELAPSED_TIME);
         }
         return 0;
     }
