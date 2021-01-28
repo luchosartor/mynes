@@ -32,13 +32,13 @@ public class GameService {
     }
 
     public GameDTO getOrCreateGame(final String username) {
-        return gameRepository.getGame(username)
+        return gameRepository.findById(username)
             .map(GameUtil::gameAsDTO)
             .orElseGet(() -> createGame(username, Constants.DEFAULT_CONFIG));
     }
 
     public Optional<Click> clickCell(final String username, final int x, final int y) {
-        Game game = gameRepository.getGame(username).orElseThrow(() -> new IllegalStateException("Cannot click in null game"));
+        Game game = gameRepository.findById(username).orElseThrow(() -> new IllegalStateException("Cannot click in null game"));
         if (game.getStatus() == Status.OVER) {
             return Optional.of(new Click(game.getBoard(), Result.GAME_OVER));
         } else if (game.getStatus() == Status.INITIAL) {
@@ -55,17 +55,17 @@ public class GameService {
         }
         if (cell.isMine()) {
             final List<Cell> mines = cells.stream().filter(Cell::isMine).collect(Collectors.toList());
-            gameRepository.saveGame(username, new Game(Status.OVER, game.getStart(), game.getConfig(), game.getBoard()));
+            gameRepository.save(new Game(username, Status.OVER, game.getStart(), game.getConfig(), game.getBoard()));
             return Optional.of(new Click(new BoardDTO(mines, game.getBoard().getFlagsLeft()), Result.GAME_OVER));
         }
         final List<Cell> revealed = new ArrayList<>();
         revealCells(cell, cells, revealed);
         final long remainingCells = game.getBoard().getCells().stream().filter(c -> !c.isMine()).filter(c -> c.getStatus() != CellStatus.REVEALED).count();
         if (remainingCells == 0) {
-            gameRepository.saveGame(username, new Game(Status.VICTORY, game.getStart(), game.getConfig(), game.getBoard()));
+            gameRepository.save(new Game(username, Status.VICTORY, game.getStart(), game.getConfig(), game.getBoard()));
             return Optional.of(new Click(new BoardDTO(revealed, game.getBoard().getFlagsLeft()), Result.VICTORY));
         }
-        gameRepository.saveGame(username, new Game(Status.RUNNING, game.getStart(), game.getConfig(), game.getBoard()));
+        gameRepository.save(new Game(username, Status.RUNNING, game.getStart(), game.getConfig(), game.getBoard()));
         return Optional.of(new Click(new BoardDTO(revealed, game.getBoard().getFlagsLeft()), Result.SUCCESS));
     }
 
@@ -82,13 +82,13 @@ public class GameService {
 
     public GameDTO createGame(final String username, final Config config) {
         final Config gameConfig = Optional.ofNullable(config).orElse(Constants.DEFAULT_CONFIG);
-        final Game game = GameFactory.createEmptyGame(gameConfig);
-        gameRepository.saveGame(username, game);
+        final Game game = GameFactory.createEmptyGame(gameConfig, username);
+        gameRepository.save(game);
         return GameUtil.gameAsDTO(game);
     }
 
     public Optional<Click> flagCell(final String username, final int x, final int y) {
-        Game game = gameRepository.getGame(username).orElseThrow(() -> new IllegalStateException("Cannot click in null game"));
+        Game game = gameRepository.findById(username).orElseThrow(() -> new IllegalStateException("Cannot click in null game"));
         final BoardDTO board = game.getBoard();
         if (game.getStatus() == Status.OVER) {
             return Optional.of(new Click(board, Result.GAME_OVER));
@@ -109,7 +109,7 @@ public class GameService {
             cell.setStatus(CellStatus.FLAG);
             board.setFlagsLeft(board.getFlagsLeft() - 1);
         }
-        gameRepository.saveGame(username, new Game(Status.RUNNING, game.getStart(), game.getConfig(), board));
+        gameRepository.save(new Game(username, Status.RUNNING, game.getStart(), game.getConfig(), board));
         return Optional.of(new Click(new BoardDTO(Collections.singletonList(cell), board.getFlagsLeft()), Result.SUCCESS));
     }
 }
