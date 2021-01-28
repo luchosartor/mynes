@@ -17,7 +17,7 @@ import sand.lsartor.voltorb.model.Cell;
 import sand.lsartor.voltorb.model.CellStatus;
 import sand.lsartor.voltorb.model.Game;
 import sand.lsartor.voltorb.model.ValueCell;
-import sand.lsartor.voltorb.repositories.GameRepository;
+import sand.lsartor.voltorb.repositories.InMemRepository;
 import sand.lsartor.voltorb.util.CellUtil;
 import sand.lsartor.voltorb.util.Constants;
 import sand.lsartor.voltorb.util.GameUtil;
@@ -25,9 +25,9 @@ import sand.lsartor.voltorb.util.GameUtil;
 @Service
 public class GameService {
 
-    private final GameRepository gameRepository;
+    private final InMemRepository gameRepository;
 
-    public GameService(final GameRepository gameRepository) {
+    public GameService(final InMemRepository gameRepository) {
         this.gameRepository = gameRepository;
     }
 

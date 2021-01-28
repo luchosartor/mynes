@@ -1,13 +1,12 @@
 package sand.lsartor.voltorb.model;
 
 import java.time.OffsetDateTime;
-import org.springframework.data.annotation.Id;
 import sand.lsartor.voltorb.dto.BoardDTO;
 import sand.lsartor.voltorb.dto.Config;
 import sand.lsartor.voltorb.dto.Status;
 
 public class Game {
-    @Id
+    //    @Id
     private String username;
     private Status status;
     private OffsetDateTime start;
