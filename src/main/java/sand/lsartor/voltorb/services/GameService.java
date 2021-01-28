@@ -38,11 +38,11 @@ public class GameService {
     }
 
     public Optional<Click> clickCell(final String username, final int x, final int y) {
-        Game game = gameRepository.findById(username).orElseThrow(() -> new IllegalStateException("Cannot click in null game"));
+        final Game game = gameRepository.findById(username).orElseThrow(() -> new IllegalStateException("Cannot click in null game"));
         if (game.getStatus() == Status.OVER) {
             return Optional.of(new Click(game.getBoard(), Result.GAME_OVER));
         } else if (game.getStatus() == Status.INITIAL) {
-            game = GameFactory.initGame(x, y, game);
+            GameFactory.initGame(x, y, game);
         }
         return clickCell(x, y, game, username);
     }
@@ -93,7 +93,7 @@ public class GameService {
         if (game.getStatus() == Status.OVER) {
             return Optional.of(new Click(board, Result.GAME_OVER));
         } else if (game.getStatus() == Status.INITIAL) {
-            game = GameFactory.initGame(x, y, game);
+            GameFactory.initGame(x, y, game);
         }
         final List<Cell> cells = board.getCells();
         final Cell cell = CellUtil.findCell(cells, x, y).orElseThrow(IllegalStateException::new);

@@ -1,5 +1,6 @@
 package sand.lsartor.voltorb.factories;
 
+import java.time.OffsetDateTime;
 import sand.lsartor.voltorb.dto.BoardDTO;
 import sand.lsartor.voltorb.dto.Config;
 import sand.lsartor.voltorb.dto.Status;
@@ -11,10 +12,10 @@ public enum GameFactory {
         return new Game(username, Status.INITIAL, gameConfig, BoardFactory.emptyBoard(gameConfig));
     }
 
-    public static Game initGame(final int x, final int y, final Game game) {
+    public static void initGame(final int x, final int y, final Game game) {
         game.setStatus(Status.RUNNING);
         final BoardDTO board = BoardFactory.createBoard(game.getConfig(), x, y);
         game.setBoard(board);
-        return game;
+        game.setStart(OffsetDateTime.now());
     }
 }
