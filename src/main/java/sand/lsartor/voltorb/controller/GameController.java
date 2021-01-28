@@ -1,4 +1,4 @@
-package sand.lsartor.voltorb.controllers;
+package sand.lsartor.voltorb.controller;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
