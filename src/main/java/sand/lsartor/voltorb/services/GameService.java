@@ -31,12 +31,26 @@ public class GameService {
         this.gameRepository = gameRepository;
     }
 
+    /**
+     * Find a game for a given user or create a new one with default config.
+     *
+     * @param username the username requesting the game
+     * @return the game retrieved from repository if found, the new game in initial state otherwise.
+     */
     public GameDTO getOrCreateGame(final String username) {
         return gameRepository.findById(username)
             .map(GameUtil::gameAsDTO)
             .orElseGet(() -> createGame(username, Constants.DEFAULT_CONFIG));
     }
 
+    /**
+     * Register a click in a given cell position and returns the cell affectation on the game's board.
+     *
+     * @param username the username clicking the cell.
+     * @param x the click x position
+     * @param y the click y position
+     * @return the click result if any made, empty otherwise.
+     */
     public Optional<Click> clickCell(final String username, final int x, final int y) {
         final Game game = gameRepository.findById(username).orElseThrow(() -> new IllegalStateException("Cannot click in null game"));
         if (game.getStatus() == Status.OVER) {
@@ -49,7 +63,7 @@ public class GameService {
 
     private Optional<Click> clickCell(final int x, final int y, final Game game, final String username) {
         final List<Cell> cells = game.getBoard().getCells();
-        final Cell cell = CellUtil.findCell(cells, x, y).orElseThrow(IllegalStateException::new);
+        final Cell cell = CellUtil.findCell(cells, x, y).orElseThrow(IllegalArgumentException::new);
         if (cell.getStatus() != CellStatus.CLEAR) {
             return Optional.empty();
         }
@@ -80,6 +94,13 @@ public class GameService {
         }
     }
 
+    /**
+     * Create a new game for a given user, for the specified config. If previous game found for username, then replaces it with the new one.
+     *
+     * @param username the username attempting to create the game.
+     * @param config the gameplay's config.
+     * @return the created Game information.
+     */
     public GameDTO createGame(final String username, final Config config) {
         final Config gameConfig = Optional.ofNullable(config).orElse(Constants.DEFAULT_CONFIG);
         final Game game = GameFactory.createEmptyGame(gameConfig, username);
@@ -87,6 +108,14 @@ public class GameService {
         return GameUtil.gameAsDTO(game);
     }
 
+    /**
+     * Register a flag in a given cell position and returns the cell affectation on the game's board.
+     *
+     * @param username the username flagging the cell.
+     * @param x the flag x position
+     * @param y the flag y position
+     * @return the flag result if any made, empty otherwise.
+     */
     public Optional<Click> flagCell(final String username, final int x, final int y) {
         Game game = gameRepository.findById(username).orElseThrow(() -> new IllegalStateException("Cannot click in null game"));
         final BoardDTO board = game.getBoard();
@@ -96,7 +125,7 @@ public class GameService {
             GameFactory.initGame(x, y, game);
         }
         final List<Cell> cells = board.getCells();
-        final Cell cell = CellUtil.findCell(cells, x, y).orElseThrow(IllegalStateException::new);
+        final Cell cell = CellUtil.findCell(cells, x, y).orElseThrow(IllegalArgumentException::new);
         if (cell.getStatus() == CellStatus.REVEALED) {
             return Optional.empty();
         } else if (cell.getStatus() == CellStatus.FLAG) {

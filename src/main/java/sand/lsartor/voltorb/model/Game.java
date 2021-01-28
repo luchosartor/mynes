@@ -6,7 +6,7 @@ import sand.lsartor.voltorb.dto.Config;
 import sand.lsartor.voltorb.dto.Status;
 
 public class Game {
-    //    @Id
+    //    @Id annotation for Mongo implementation.
     private String username;
     private Status status;
     private OffsetDateTime start;
